@@ -1,0 +1,61 @@
+# Deploy the explainer page.
+#
+# Unlike the other repos on this account, this page needs a build step. It does
+# not use a bundler: it imports the library's own compiled ES modules, so what a
+# visitor's browser runs is exactly the published output. That is the second job
+# this page does, after explaining the project. If the ESM build were broken in
+# a browser, the page would fail to load and the deploy would show it.
+#
+# So the workflow compiles the library and copies dist into site/lib. Nothing
+# else about the page is built: it is plain HTML, CSS and ES modules.
+#
+# One manual step per repo, once: Settings, Pages, Source, GitHub Actions.
+
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          standalone: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build the library the page imports
+        run: pnpm run build
+
+      - name: Put the compiled modules where the page expects them
+        run: cp -r dist site/lib
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

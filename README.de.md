@@ -102,7 +102,7 @@ Beides ist derselbe Fehlertyp, und aufschreiben sollte man ihn deshalb, weil kei
 
 ## Tests
 
-60 Tests, auf Node 18, 20 und 22.
+61 Tests, auf Node 18, 20 und 22.
 
 ```bash
 pnpm install

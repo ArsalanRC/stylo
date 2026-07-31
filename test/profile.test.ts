@@ -105,19 +105,34 @@ describe("compare", () => {
   it("warns when the text is too short for the bands to mean anything", () => {
     const result = compare(a, buildProfile([a, b], "en"));
     expect(result.words).toBe(12);
-    expect(result.warnings.join(" ")).toMatch(/short/);
+
+    const short = result.warnings.find((w) => w.code === "short-text");
+    expect(short?.words).toBe(12);
+    expect(short?.corpusMeanWords).toBe(13); // 26 corpus words over 2 texts
+    expect(short?.message).toMatch(/short/);
   });
 
   it("warns when the profile is built from few sources", () => {
     const result = compare(a, buildProfile([a, b], "en"));
-    expect(result.warnings.join(" ")).toMatch(/2 texts/);
+    expect(result.warnings.find((w) => w.code === "small-corpus")?.sources).toBe(2);
+  });
+
+  it("carries a code on every warning, so a caller can translate it", () => {
+    // The page is bilingual, so it renders warnings from the code rather than
+    // showing the English message to a German reader.
+    const result = compare(a, buildProfile([a, b], "en"));
+    expect(result.warnings.length).toBeGreaterThan(0);
+    for (const w of result.warnings) {
+      expect(["short-text", "small-corpus"]).toContain(w.code);
+      expect(w.message.length).toBeGreaterThan(0);
+    }
   });
 
   it("does not warn about length on a text past the threshold", () => {
     const long = Array.from({ length: 40 }, () => a).join(" ");
     const result = compare(long, PROFILES.en);
     expect(result.words).toBeGreaterThanOrEqual(MIN_RELIABLE_WORDS);
-    expect(result.warnings.join(" ")).not.toMatch(/short/);
+    expect(result.warnings.some((w) => w.code === "short-text")).toBe(false);
   });
 
   it("carries the breakdown alongside the distance, always", () => {

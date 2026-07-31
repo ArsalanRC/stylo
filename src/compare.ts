@@ -44,6 +44,39 @@ export interface FeatureComparison {
  */
 export const MIN_RELIABLE_WORDS = 300;
 
+/**
+ * Below this many corpus texts, every percentile is coarse.
+ *
+ * With thirteen sources the tenth percentile is an interpolation between the
+ * first and second value, so one atypical source visibly moves the band. The
+ * bundled profiles are under this number themselves, which is exactly why the
+ * warning exists rather than being someone else's problem.
+ */
+export const MIN_RELIABLE_SOURCES = 20;
+
+export type WarningCode = "short-text" | "small-corpus";
+
+/**
+ * Something known to make a particular result unreliable.
+ *
+ * Structured rather than a sentence, and the reason is the demo page. It is
+ * bilingual, so a warning that exists only as English prose cannot be shown to
+ * a German reader, and the caller would be left parsing the message to find out
+ * what happened. The code and the numbers are the fact; `message` is a default
+ * rendering for callers that just want to print something.
+ */
+export interface Warning {
+  readonly code: WarningCode;
+  /** Words in the measured text. Present on `short-text`. */
+  readonly words?: number;
+  /** Mean words per corpus text. Present on `short-text`. */
+  readonly corpusMeanWords?: number;
+  /** Texts the profile was built from. Present on `small-corpus`. */
+  readonly sources?: number;
+  /** English, for callers that do not want to render it themselves. */
+  readonly message: string;
+}
+
 export interface Comparison {
   readonly lang: Lang;
   /** Words measured, so a reader can judge the numbers for themselves. */
@@ -54,7 +87,7 @@ export interface Comparison {
    * Empty most of the time. When it is not empty, it is the first thing to read,
    * which is why it is a field on the result rather than a note in the README.
    */
-  readonly warnings: readonly string[];
+  readonly warnings: readonly Warning[];
   /**
    * Root mean square of the nineteen z scores.
    *
@@ -96,19 +129,29 @@ export function compare(text: string, profile: CorpusProfile): Comparison {
     comparisons.reduce((sum, c) => sum + c.z ** 2, 0) / Math.max(comparisons.length, 1),
   );
 
-  const warnings: string[] = [];
+  const warnings: Warning[] = [];
+
   if (doc.words.length < MIN_RELIABLE_WORDS) {
-    warnings.push(
-      `${doc.words.length} words is short. The profile describes texts averaging ` +
-        `${Math.round(profile.words / profile.sources)} words, and several features ` +
-        `cannot mean the same thing on a passage this size. Read the breakdown, not the distance.`,
-    );
+    const corpusMeanWords = Math.round(profile.words / profile.sources);
+    warnings.push({
+      code: "short-text",
+      words: doc.words.length,
+      corpusMeanWords,
+      message:
+        `${doc.words.length} words is short. The profile describes texts averaging ` +
+        `${corpusMeanWords} words, and several features cannot mean the same thing on a ` +
+        `passage this size. Read the breakdown, not the distance.`,
+    });
   }
-  if (profile.sources < 20) {
-    warnings.push(
-      `The profile is built from ${profile.sources} texts, so its percentiles are ` +
+
+  if (profile.sources < MIN_RELIABLE_SOURCES) {
+    warnings.push({
+      code: "small-corpus",
+      sources: profile.sources,
+      message:
+        `The profile is built from ${profile.sources} texts, so its percentiles are ` +
         `coarse and a single unusual source moves them.`,
-    );
+    });
   }
 
   return {

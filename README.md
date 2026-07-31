@@ -102,7 +102,7 @@ Both are the same kind of bug and the reason to write them down is that neither 
 
 ## Tests
 
-60 tests, on Node 18, 20 and 22.
+61 tests, on Node 18, 20 and 22.
 
 ```bash
 pnpm install
