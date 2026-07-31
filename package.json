@@ -1,0 +1,59 @@
+{
+  "name": "@arsalanrc/stylo",
+  "version": "0.1.0",
+  "description": "Transparent stylometric measurement. Measures a text on 19 features and shows how each one sits against a measured corpus of human academic prose. No verdict, just the numbers. Zero dependencies, TypeScript.",
+  "keywords": [
+    "stylometry",
+    "text-analysis",
+    "linguistics",
+    "corpus",
+    "readability",
+    "writing",
+    "typescript"
+  ],
+  "license": "MIT",
+  "author": "Arsalan Khadim",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArsalanRC/stylo.git"
+  },
+  "homepage": "https://github.com/ArsalanRC/stylo#readme",
+  "bugs": {
+    "url": "https://github.com/ArsalanRC/stylo/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit",
+    "prepare": "pnpm run build",
+    "prepublishOnly": "pnpm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@11.1.2"
+}
