@@ -7,7 +7,7 @@
 // library exists as an alternative to, and an API that makes it easy to extract
 // one would get used that way.
 
-import { FEATURES, measure } from "./features.js";
+import { analyse, FEATURES, measure } from "./features.js";
 import type { Band, CorpusProfile } from "./profile.js";
 import type { Lang } from "./tokenize.js";
 
@@ -30,8 +30,31 @@ export interface FeatureComparison {
   readonly insideBand: boolean;
 }
 
+/**
+ * Below this many words, a comparison is reported with a warning attached.
+ *
+ * The bands describe variation between whole papers of a few thousand words
+ * each. Several features cannot mean the same thing on a paragraph: repeated
+ * sentence openings can only rise as sentences accumulate, and a single formal
+ * connective in forty words is a rate ten times any corpus text's, without the
+ * writing being unusual in any way a reader would recognise.
+ *
+ * 300 is a judgement, not a threshold with a derivation behind it. It is about
+ * where a single sentence stops dominating the ratios.
+ */
+export const MIN_RELIABLE_WORDS = 300;
+
 export interface Comparison {
   readonly lang: Lang;
+  /** Words measured, so a reader can judge the numbers for themselves. */
+  readonly words: number;
+  /**
+   * Anything known to make this particular result unreliable.
+   *
+   * Empty most of the time. When it is not empty, it is the first thing to read,
+   * which is why it is a field on the result rather than a note in the README.
+   */
+  readonly warnings: readonly string[];
   /**
    * Root mean square of the nineteen z scores.
    *
@@ -50,6 +73,7 @@ export interface Comparison {
 
 /** Measure a text and place each feature against the profile. */
 export function compare(text: string, profile: CorpusProfile): Comparison {
+  const doc = analyse(text, profile.lang);
   const vector = measure(text, profile.lang);
   const comparisons: FeatureComparison[] = [];
 
@@ -72,8 +96,25 @@ export function compare(text: string, profile: CorpusProfile): Comparison {
     comparisons.reduce((sum, c) => sum + c.z ** 2, 0) / Math.max(comparisons.length, 1),
   );
 
+  const warnings: string[] = [];
+  if (doc.words.length < MIN_RELIABLE_WORDS) {
+    warnings.push(
+      `${doc.words.length} words is short. The profile describes texts averaging ` +
+        `${Math.round(profile.words / profile.sources)} words, and several features ` +
+        `cannot mean the same thing on a passage this size. Read the breakdown, not the distance.`,
+    );
+  }
+  if (profile.sources < 20) {
+    warnings.push(
+      `The profile is built from ${profile.sources} texts, so its percentiles are ` +
+        `coarse and a single unusual source moves them.`,
+    );
+  }
+
   return {
     lang: profile.lang,
+    words: doc.words.length,
+    warnings,
     distance,
     features: [...comparisons].sort((a, b) => Math.abs(b.z) - Math.abs(a.z)),
   };

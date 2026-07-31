@@ -40,7 +40,7 @@ export type { Doc, FeatureSpec, FeatureVector } from "./features.js";
 export { buildProfile, percentile } from "./profile.js";
 export type { Band, CorpusProfile } from "./profile.js";
 
-export { compare } from "./compare.js";
+export { compare, MIN_RELIABLE_WORDS } from "./compare.js";
 export type { Comparison, FeatureComparison } from "./compare.js";
 
 export { paragraphs, sentences, words } from "./tokenize.js";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { compare } from "../src/compare.js";
+import { compare, MIN_RELIABLE_WORDS } from "../src/compare.js";
 import { FEATURES } from "../src/features.js";
 import { buildProfile, percentile } from "../src/profile.js";
 import { PROFILES } from "../src/profiles.js";
@@ -100,6 +100,24 @@ describe("compare", () => {
     for (const f of result.features) {
       expect(f.insideBand).toBe(f.value >= f.band.p10 && f.value <= f.band.p90);
     }
+  });
+
+  it("warns when the text is too short for the bands to mean anything", () => {
+    const result = compare(a, buildProfile([a, b], "en"));
+    expect(result.words).toBe(12);
+    expect(result.warnings.join(" ")).toMatch(/short/);
+  });
+
+  it("warns when the profile is built from few sources", () => {
+    const result = compare(a, buildProfile([a, b], "en"));
+    expect(result.warnings.join(" ")).toMatch(/2 texts/);
+  });
+
+  it("does not warn about length on a text past the threshold", () => {
+    const long = Array.from({ length: 40 }, () => a).join(" ");
+    const result = compare(long, PROFILES.en);
+    expect(result.words).toBeGreaterThanOrEqual(MIN_RELIABLE_WORDS);
+    expect(result.warnings.join(" ")).not.toMatch(/short/);
   });
 
   it("carries the breakdown alongside the distance, always", () => {
