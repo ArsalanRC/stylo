@@ -5,151 +5,170 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title data-i18n="meta.title">stylo</title>
 <meta name="description" content="Measures nineteen features of a text against a corpus of human academic writing and shows every one of them. No verdict, no percentage." />
+<meta name="theme-color" content="#0C111D" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="./base.css" />
-<link rel="stylesheet" href="./theme.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./style.css" />
 <script>
-  // Before first paint: no theme flash, no language flash. Inline on purpose.
+  /* Language before first paint, so nothing flashes in the wrong one. */
   (function () {
-    var p = "stylo", t = null, l = null;
-    try { t = localStorage.getItem(p + "-theme"); l = localStorage.getItem(p + "-lang"); } catch (e) {}
-    document.documentElement.dataset.theme =
-      t || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
-    var browserIsGerman = (navigator.language || "en").toLowerCase().startsWith("de");
-    document.documentElement.lang = l || (browserIsGerman ? "de" : "en");
+    var l = null;
+    try { l = localStorage.getItem("stylo-lang"); } catch (e) {}
+    var de = (navigator.language || "en").toLowerCase().startsWith("de");
+    document.documentElement.lang = l || (de ? "de" : "en");
   })();
 </script>
 </head>
 <body>
 
-<header class="topbar">
-  <a class="wordmark" href="#top">stylo</a>
-  <nav class="topnav">
-    <a href="https://github.com/ArsalanRC/stylo" target="_blank" rel="noopener">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg><span data-i18n="nav.source">Source</span>
+<div class="frame">
+
+  <nav class="nav">
+    <a class="brand" href="#top">
+      <span class="rings" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>stylo</span>
     </a>
-    <a href="https://github.com/ArsalanRC" target="_blank" rel="noopener">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg><span data-i18n="nav.github">GitHub</span>
-    </a>
-    <a href="https://www.linkedin.com/in/muhammad-arsalan-khadim-b87550259/" target="_blank" rel="noopener">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zm1.78 13.02H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg><span data-i18n="nav.linkedin">LinkedIn</span>
-    </a>
-    <button type="button" class="pill" id="lang-btn" data-i18n="nav.lang">Deutsch</button>
-    <button type="button" class="icon-btn" id="theme-btn" aria-label="Switch theme">
-      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.4M12 19.2v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.4 12h2.4M19.2 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
-      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6 0 1 1 9.4 3.5a6.9 6.9 0 0 0 11.1 11.1z"/></svg>
-    </button>
+
+    <div class="nav-links">
+      <a href="#instrument" data-i18n="nav.measure">Measure</a>
+      <a href="#limits" data-i18n="nav.limits">Limits</a>
+      <a href="#scale" data-i18n="nav.scale">Scale</a>
+    </div>
+
+    <div class="nav-actions">
+      <button type="button" class="lang" id="lang-btn" data-i18n="nav.lang">DE</button>
+      <a class="icon" href="https://github.com/ArsalanRC/stylo" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+      </a>
+      <a class="cta-pill" href="#instrument" data-i18n="nav.cta">Measure a text</a>
+    </div>
   </nav>
-</header>
 
-<main id="top">
+  <main id="top">
 
-  <section class="hero">
-    <p class="kicker" data-i18n="hero.kicker"></p>
-    <h1 class="hero-title" data-i18n-html="hero.title"></h1>
-    <p class="lede" data-i18n="hero.lede"></p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="https://github.com/ArsalanRC/stylo" target="_blank" rel="noopener" data-i18n="hero.cta"></a>
-    </div>
-  </section>
+    <!-- ---------------------------------------------------------- hero -- -->
+    <section class="hero wrap">
+      <h1 data-i18n-html="hero.title">Nineteen measurements.<br>No verdict.</h1>
+      <p data-i18n="hero.lede"></p>
+      <div class="hero-actions">
+        <a class="btn" href="#instrument" data-i18n="hero.measure">Measure a text</a>
+        <a class="btn btn-ghost" href="https://github.com/ArsalanRC/stylo" target="_blank" rel="noopener" data-i18n="hero.source">Read the source</a>
+      </div>
+      <p class="version" data-i18n="hero.version">TypeScript · zero dependencies · 61 tests</p>
+    </section>
 
-  <section class="band">
-    <p class="eyebrow" data-i18n="try.eyebrow"></p>
-    <h2 data-i18n="try.title"></h2>
-    <p class="body" data-i18n="try.body"></p>
+    <!-- ---------------------------------------------------- the stage -- -->
+    <section id="instrument" class="wrap" style="padding-top:0">
+      <div class="stage rise">
+        <div class="stage-grid">
 
-    <div class="instrument">
-      <div class="paper">
-        <textarea id="input" spellcheck="false" data-i18n-placeholder="try.placeholder"></textarea>
-        <div class="paper-foot">
-          <span class="wordcount" id="wordcount"></span>
-          <button type="button" class="btn btn-primary" id="measure" data-i18n="try.measure"></button>
+          <div class="pad">
+            <textarea id="input" spellcheck="false" data-i18n-placeholder="try.placeholder"></textarea>
+            <div class="pad-foot">
+              <span class="count" id="count"></span>
+              <button type="button" class="btn" id="measure" data-i18n="try.measure">Measure</button>
+            </div>
+            <div class="chips">
+              <button type="button" class="chip" id="sample-even" data-i18n="try.sampleEven"></button>
+              <button type="button" class="chip" id="sample-uniform" data-i18n="try.sampleUniform"></button>
+              <button type="button" class="chip" id="clear" data-i18n="try.clear"></button>
+            </div>
+          </div>
+
+          <div class="hud">
+            <div class="hud-top">
+              <div>
+                <div class="hud-label" data-i18n="try.distanceLabel">Distance</div>
+                <div class="hud-value" id="distance">0.00</div>
+              </div>
+              <p class="hud-note" id="note"></p>
+            </div>
+            <p class="hud-warn" id="warn"></p>
+            <div class="hud-rows" id="rows"></div>
+          </div>
+
         </div>
-        <div class="presets">
-          <button type="button" class="pill" id="sample-even" data-i18n="try.sampleEven"></button>
-          <button type="button" class="pill" id="sample-uniform" data-i18n="try.sampleUniform"></button>
-          <button type="button" class="pill" id="clear" data-i18n="try.clear"></button>
+      </div>
+    </section>
+
+    <!-- --------------------------------------------------------- cards -- -->
+    <section class="wrap">
+      <div class="cards rise">
+        <article class="card">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+          <h3 data-i18n="card.1t">Nineteen features, one function each</h3>
+          <p data-i18n="card.1b"></p>
+        </article>
+        <article class="card">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 8h18M3 16h18"/></svg>
+          <h3 data-i18n="card.2t">The profile is statistics, not texts</h3>
+          <p data-i18n="card.2b"></p>
+        </article>
+        <article class="card">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
+          <h3 data-i18n="card.3t">No verdict, by design</h3>
+          <p data-i18n="card.3b"></p>
+        </article>
+      </div>
+    </section>
+
+    <!-- --------------------------------------------------------- limits -- -->
+    <section id="limits" class="wrap">
+      <div class="light rise">
+        <p class="reveal-text" id="reveal" data-reveal="limits.statement"></p>
+        <p class="light-note" data-i18n="limits.note"></p>
+      </div>
+    </section>
+
+    <!-- ---------------------------------------------------------- scale -- -->
+    <section id="scale" class="wrap">
+      <p class="eyebrow rise" data-i18n="scale.eyebrow">The scale</p>
+      <h2 class="rise" data-i18n="scale.title">What typical actually looks like</h2>
+      <p class="lede rise" data-i18n="scale.body"></p>
+      <div class="scale rise">
+        <div class="axis" id="axis"></div>
+        <div class="key">
+          <span><i class="k-en"></i><span data-i18n="scale.keyEn"></span></span>
+          <span><i class="k-de"></i><span data-i18n="scale.keyDe"></span></span>
+        </div>
+      </div>
+      <p class="lede" style="margin-top:1.5rem" data-i18n="scale.foot"></p>
+    </section>
+
+    <!-- --------------------------------------------------------- footer -- -->
+    <footer class="foot wrap">
+      <div class="foot-grid">
+        <div>
+          <h4 data-i18n="foot.aboutHead">stylo</h4>
+          <p style="color:var(--muted);font-size:.9rem;margin:0;max-width:34ch" data-i18n="foot.about"></p>
+        </div>
+        <div>
+          <h4 data-i18n="foot.projectHead">Project</h4>
+          <a href="https://github.com/ArsalanRC/stylo" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/ArsalanRC/stylo#readme" target="_blank" rel="noopener" data-i18n="foot.readme">README</a>
+          <a href="https://github.com/ArsalanRC/stylo/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>
+        </div>
+        <div>
+          <h4 data-i18n="foot.elseHead">Elsewhere</h4>
+          <a href="https://arsalanrc.github.io" target="_blank" rel="noopener">Portfolio</a>
+          <a href="https://github.com/ArsalanRC" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://www.linkedin.com/in/muhammad-arsalan-khadim-b87550259/" target="_blank" rel="noopener">LinkedIn</a>
         </div>
       </div>
 
-      <div class="readout">
-        <div class="readout-head">
-          <div class="distance" id="distance">0.00<small id="distance-label" data-i18n="try.distanceLabel"></small></div>
-          <p class="verdict-note" id="verdict-note"></p>
-        </div>
-        <p class="warnings" id="warnings"></p>
-        <div class="rows" id="rows"></div>
-        <div class="legend">
-          <span><i class="k-band"></i><span data-i18n="try.legendBand"></span></span>
-          <span><i class="k-in"></i><span data-i18n="try.legendIn"></span></span>
-          <span><i class="k-out"></i><span data-i18n="try.legendOut"></span></span>
-        </div>
+      <div class="foot-bar">
+        <span data-i18n="foot.built">Built by hand, no template</span>
+        <span>
+          <span data-i18n="foot.creditPre">Visual direction adapted from</span>
+          <a href="https://www.cleanmeter.app/" target="_blank" rel="noopener">cleanmeter.app</a><span data-i18n="foot.creditPost">. Built from scratch, no code or assets taken.</span>
+        </span>
+        <span>© 2026 Arsalan Khadim</span>
       </div>
-    </div>
-  </section>
+    </footer>
 
-  <section class="band">
-    <p class="eyebrow" data-i18n="limits.eyebrow"></p>
-    <h2 data-i18n="limits.title"></h2>
-    <div class="limits">
-      <article class="limit">
-        <h3 data-i18n="limits.l1t"></h3>
-        <p data-i18n="limits.l1b"></p>
-      </article>
-      <article class="limit">
-        <h3 data-i18n="limits.l2t"></h3>
-        <p data-i18n="limits.l2b"></p>
-      </article>
-      <article class="limit">
-        <h3 data-i18n="limits.l3t"></h3>
-        <p data-i18n="limits.l3b"></p>
-      </article>
-      <article class="limit">
-        <h3 data-i18n="limits.l4t"></h3>
-        <p data-i18n="limits.l4b"></p>
-      </article>
-    </div>
-  </section>
-
-  <section class="band" id="scale">
-    <p class="eyebrow" data-i18n="scale.eyebrow"></p>
-    <h2 data-i18n="scale.title"></h2>
-    <p class="body" data-i18n="scale.body"></p>
-    <div class="scale">
-      <div class="scale-axis" id="scale-axis"></div>
-      <div class="scale-key">
-        <span><i class="k-en"></i><span data-i18n="scale.keyEn"></span></span>
-        <span><i class="k-de"></i><span data-i18n="scale.keyDe"></span></span>
-      </div>
-    </div>
-    <p class="note" data-i18n="scale.foot"></p>
-  </section>
-
-  <section class="band">
-    <p class="eyebrow" data-i18n="status.eyebrow"></p>
-    <h2 data-i18n="status.title"></h2>
-    <ul class="ledger">
-      <li class="is-done"><span data-i18n="status.p1"></span><em data-i18n="status.done"></em></li>
-      <li class="is-done"><span data-i18n="status.p2"></span><em data-i18n="status.done"></em></li>
-      <li class="is-done"><span data-i18n="status.p3"></span><em data-i18n="status.done"></em></li>
-      <li class="is-done"><span data-i18n="status.p4"></span><em data-i18n="status.done"></em></li>
-      <li><span data-i18n="status.p5"></span><em data-i18n="status.todo"></em></li>
-      <li><span data-i18n="status.p6"></span><em data-i18n="status.todo"></em></li>
-    </ul>
-  </section>
-
-</main>
-
-<footer class="foot">
-  <span><span data-i18n="foot.built">Built by</span>
-    <a href="https://www.linkedin.com/in/muhammad-arsalan-khadim-b87550259/" target="_blank" rel="noopener">Arsalan Khadim</a></span>
-  <span class="sep">·</span>
-  <span data-i18n="foot.deps"></span>
-  <span class="sep">·</span>
-  <span>MIT</span>
-</footer>
+  </main>
+</div>
 
 <script type="module" src="./app.js"></script>
 </body>

@@ -1,0 +1,568 @@
+/* ===========================================================================
+   stylo: the instrument.
+   ---------------------------------------------------------------------------
+   每 repo on this account gets its own design, so this page shares nothing with
+   the portfolio but the person who made it. The direction is adapted from
+   cleanmeter.app, credited in the footer: a dark product page built around one
+   live readout, with the readout itself presented as a translucent overlay
+   floating above a bright desktop.
+
+   That conceit fits stylo better than it fits most things. Cleanmeter shows
+   frames per second and core temperature over your wallpaper; stylo shows
+   nineteen stylometric measurements over the same kind of surface. Both are a
+   meter you leave running while you do something else. The vocabulary is
+   already right, so only the nouns change.
+
+   The wallpaper is an original mesh gradient rather than a stock macOS image.
+   Shipping Apple's artwork would be the single riskiest file on the page and it
+   would also stop the panel adapting to the theme.
+   =========================================================================== */
+
+:root {
+  /* Read off the reference and kept, because the palette is the identity here:
+     a near-black navy that is not quite black, panels a step above it, and one
+     light section for contrast. */
+  --ink:      #0C111D;
+  --panel:    #161B26;
+  --panel-2:  #1F242F;
+  --line:     rgba(255, 255, 255, 0.09);
+  --line-2:   rgba(255, 255, 255, 0.16);
+
+  --text:     #FFFFFF;
+  --muted:    #94969C;
+  --dim:      #61646C;
+
+  --paper:    #F5F5F6;
+  --paper-in: #0C111D;
+
+  /* Green reads healthy, orange reads borderline, red reads out of range.
+     Exactly the meaning they carry on the reference, and exactly the meaning
+     stylo needs for a feature sitting inside, near or outside its band. */
+  --ok:       #079455;
+  --warn:     #DC6803;
+  --bad:      #D94920;
+
+  --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --r:     12px;
+  --r-lg:  18px;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --col:   72rem;
+
+  /* Apple glass, the three parts that matter. A translucent fill, a blur that
+     also lifts saturation so the colour behind stays colour instead of going
+     grey, and a highlight along the top edge where light would catch a pane. */
+  --glass:      rgba(255, 255, 255, 0.07);
+  --glass-2:    rgba(255, 255, 255, 0.04);
+  --glass-blur: saturate(180%) blur(24px);
+  --glass-top:  inset 0 1px 0 rgba(255, 255, 255, 0.13);
+  --shadow:     0 24px 60px -28px rgba(0, 0, 0, 0.8);
+}
+
+/* --------------------------------------------------------------- skeleton -- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: #06090F;
+  color: var(--text);
+  font: 400 1rem/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+
+::selection { background: rgba(7, 148, 85, 0.35); }
+
+:where(a, button, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--ok);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* The whole document sits inside a rounded, bordered frame, so the page reads
+   as an application window rather than as a web page. Straight from the
+   reference and worth taking: it costs one element and sets the register
+   before a single word is read. */
+.frame {
+  margin: 10px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--ink);
+  overflow: clip;
+}
+
+.wrap { width: min(100% - var(--gutter) * 2, var(--col)); margin-inline: auto; }
+
+section { padding-block: clamp(3.5rem, 9vw, 7rem); }
+
+/* ------------------------------------------------------------------- nav -- */
+
+.nav {
+  position: sticky;
+  top: 14px;
+  z-index: 50;
+  width: min(100% - var(--gutter) * 2, 60rem);
+  margin: 14px auto 0;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .55rem .55rem .55rem 1rem;
+  background: rgba(22, 27, 38, 0.72);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--shadow), var(--glass-top);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  font: 600 .95rem/1 var(--sans);
+  letter-spacing: -.01em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Three overlapping rings, the meter motif. Green, amber, red: the three states
+   a measurement can be in, which is the whole subject. */
+.rings { display: inline-flex; }
+.rings i {
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  border: 2.5px solid currentColor;
+}
+.rings i:nth-child(1) { color: var(--ok); }
+.rings i:nth-child(2) { color: var(--warn); margin-left: -6px; }
+.rings i:nth-child(3) { color: var(--bad); margin-left: -6px; }
+
+.nav-links { display: flex; gap: .1rem; margin-inline: auto; }
+
+.nav-links a {
+  padding: .45rem .8rem;
+  border-radius: 999px;
+  font: 500 .88rem/1 var(--sans);
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .18s, background .18s;
+}
+
+.nav-links a:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); }
+
+.nav-actions { display: flex; align-items: center; gap: .35rem; }
+
+.icon {
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--glass-2);
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .18s, border-color .18s;
+}
+
+.icon:hover { color: var(--text); border-color: var(--line-2); }
+.icon svg { width: 15px; height: 15px; fill: currentColor; }
+
+.lang {
+  border: 1px solid var(--line);
+  background: var(--glass-2);
+  color: var(--muted);
+  padding: .45rem .7rem;
+  border-radius: 999px;
+  font: 600 .72rem/1 var(--mono);
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: color .18s, border-color .18s;
+}
+
+.lang:hover { color: var(--text); border-color: var(--line-2); }
+
+.cta-pill {
+  padding: .55rem 1.05rem;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--ink);
+  font: 600 .86rem/1 var(--sans);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity .18s;
+}
+
+.cta-pill:hover { opacity: .85; }
+
+/* ------------------------------------------------------------------ hero -- */
+
+.hero { text-align: center; padding-block: clamp(3rem, 8vw, 6rem) clamp(2rem, 5vw, 3.5rem); }
+
+h1 {
+  margin: 0;
+  font: 600 clamp(2.4rem, 6vw, 4.2rem)/1.06 var(--sans);
+  letter-spacing: -.035em;
+}
+
+.hero p {
+  max-width: 46ch;
+  margin: 1.1rem auto 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.5vw, 1.12rem);
+}
+
+.hero-actions { display: flex; flex-wrap: wrap; gap: .6rem; justify-content: center; margin-top: 2rem; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .8rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: var(--text);
+  color: var(--ink);
+  font: 600 .95rem/1 var(--sans);
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity .18s, background .18s;
+}
+
+.btn:hover { opacity: .86; }
+
+.btn-ghost {
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-color: var(--line-2);
+  color: var(--text);
+}
+
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.11); opacity: 1; }
+
+.version { margin-top: 1rem; font: 500 .76rem/1 var(--mono); color: var(--dim); letter-spacing: .04em; }
+
+/* ------------------------------------------------------------- the stage -- */
+/* A bright desktop with the readout floating over it. The reference shows its
+   overlay against a wallpaper because that is where you would actually see it;
+   the same framing tells you in one glance that stylo is a meter you leave
+   running rather than a report you generate. */
+
+.stage {
+  position: relative;
+  border-radius: var(--r-lg);
+  overflow: clip;
+  border: 1px solid var(--line);
+  padding: clamp(1.5rem, 5vw, 4rem) clamp(1rem, 3vw, 2.5rem);
+  isolation: isolate;
+}
+
+/* An original mesh gradient rather than a stock wallpaper: four coloured blobs
+   over a base, which is how those images are built anyway. No file to ship, no
+   licence to worry about, and it can shift with the theme. */
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(46% 62% at 16% 18%, #FF9A4D 0%, rgba(255,154,77,0) 58%),
+    radial-gradient(44% 58% at 74% 10%, #E8557E 0%, rgba(232,85,126,0) 56%),
+    radial-gradient(52% 62% at 88% 72%, #8B5CD6 0%, rgba(139,92,214,0) 60%),
+    radial-gradient(48% 56% at 22% 86%, #3E9BE8 0%, rgba(62,155,232,0) 58%),
+    radial-gradient(40% 50% at 52% 48%, #C64B9E 0%, rgba(198,75,158,0) 62%),
+    linear-gradient(150deg, #5B3A7A 0%, #7A4A82 40%, #35528C 100%);
+}
+
+/* A faint grain over the gradient. Large flat gradients band on cheap panels,
+   and a little noise breaks the bands up without being visible as texture. */
+.stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: .16;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+.stage-grid {
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+@media (min-width: 62rem) {
+  .stage-grid { grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); }
+}
+
+/* ------------------------------------------------------------------- HUD -- */
+/* The overlay. This is the component the whole page is built around. */
+
+.hud {
+  background: rgba(12, 17, 29, 0.62);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: var(--r);
+  box-shadow: var(--shadow), var(--glass-top);
+  overflow: clip;
+}
+
+.hud-top {
+  display: flex;
+  align-items: baseline;
+  gap: .9rem;
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.hud-label {
+  font: 500 .66rem/1 var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hud-value {
+  font: 300 clamp(2rem, 4vw, 2.9rem)/1 var(--sans);
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-note { margin-left: auto; text-align: right; font-size: .78rem; color: var(--muted); max-width: 24ch; }
+
+.hud-warn {
+  margin: 0;
+  padding: .7rem 1.15rem;
+  background: rgba(220, 104, 3, 0.12);
+  border-bottom: 1px solid var(--line);
+  font-size: .78rem;
+  color: #F3B76B;
+}
+
+.hud-warn:empty { display: none; }
+
+.hud-rows { max-height: 27rem; overflow-y: auto; scrollbar-width: thin; }
+
+/* macOS hides overlay scrollbars until touched, so a scrolling panel otherwise
+   looks like a panel with nothing more in it. Same lesson as the recon
+   terminal and the chess move log, learned a third time. */
+.hud-rows::-webkit-scrollbar { width: 10px; }
+.hud-rows::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 99px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+.row {
+  display: grid;
+  /* Four children: label, meter, value, z. Three columns wrapped the z onto its
+     own line and doubled the row height. */
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: .75rem;
+  padding: .5rem 1.15rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.row:last-child { border-bottom: 0; }
+
+.row-label {
+  font: 500 .78rem/1.3 var(--sans);
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-val {
+  font: 500 .92rem/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  min-width: 4.2rem;
+  text-align: right;
+}
+
+.row-z {
+  font: 500 .74rem/1 var(--mono);
+  font-variant-numeric: tabular-nums;
+  min-width: 3.4rem;
+  text-align: right;
+  color: var(--ok);
+}
+
+.row.is-near .row-z { color: var(--warn); }
+.row.is-out  .row-z { color: var(--bad); }
+
+/* The bar glyph: five stacked rules whose lit count is how far the value sits
+   from the corpus. Lifted in spirit from the reference's inline meters, which
+   read at a glance in a way a number alone does not. */
+.meter { display: inline-flex; flex-direction: column; gap: 1.5px; width: 16px; }
+.meter i { height: 2px; border-radius: 1px; background: rgba(255, 255, 255, 0.16); }
+.meter i.on { background: var(--ok); }
+.row.is-near .meter i.on { background: var(--warn); }
+.row.is-out  .meter i.on { background: var(--bad); }
+
+/* --------------------------------------------------------------- the pad -- */
+
+.pad {
+  background: rgba(12, 17, 29, 0.62);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: var(--r);
+  box-shadow: var(--shadow), var(--glass-top);
+  padding: 1rem;
+}
+
+.pad textarea {
+  width: 100%;
+  height: 13rem;
+  resize: vertical;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--text);
+  font: 400 .86rem/1.6 var(--sans);
+}
+
+.pad textarea::placeholder { color: var(--dim); }
+
+.pad-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-top: .8rem;
+  padding-top: .8rem;
+  border-top: 1px solid var(--line);
+}
+
+.count { font: 500 .72rem/1 var(--mono); color: var(--muted); letter-spacing: .04em; }
+
+.chips { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .7rem; }
+
+.chip {
+  padding: .35rem .7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--glass-2);
+  color: var(--muted);
+  font: 500 .72rem/1 var(--sans);
+  cursor: pointer;
+  transition: color .18s, border-color .18s;
+}
+
+.chip:hover { color: var(--text); border-color: var(--line-2); }
+
+/* ----------------------------------------------------------------- cards -- */
+
+.cards { display: grid; gap: 1px; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: clip; }
+
+@media (max-width: 54rem) { .cards { grid-template-columns: minmax(0, 1fr); } }
+
+.card { background: var(--panel); padding: 1.6rem 1.4rem; }
+.card svg { width: 22px; height: 22px; stroke: var(--muted); fill: none; stroke-width: 1.6; margin-bottom: 1.6rem; }
+.card h3 { margin: 0 0 .45rem; font: 600 1.02rem/1.3 var(--sans); letter-spacing: -.01em; }
+.card p { margin: 0; color: var(--muted); font-size: .88rem; }
+
+/* ----------------------------------------------------------- light block -- */
+/* One light section against the dark page, carrying the statement that matters
+   most. The words darken as you scroll through them, so the sentence is read
+   rather than skimmed, which is the entire reason it is here. */
+
+.light {
+  background: var(--paper);
+  color: var(--paper-in);
+  border-radius: var(--r-lg);
+  padding: clamp(3rem, 9vw, 7rem) clamp(1.25rem, 5vw, 4rem);
+}
+
+.reveal-text {
+  margin: 0 auto;
+  max-width: 24ch;
+  font: 600 clamp(1.6rem, 4.2vw, 3rem)/1.24 var(--sans);
+  letter-spacing: -.028em;
+}
+
+.reveal-text .w { color: rgba(12, 17, 29, 0.16); transition: color .28s linear; }
+.reveal-text .w.on { color: var(--paper-in); }
+.reveal-text .w.accent.on { color: var(--ok); }
+
+.light-note { max-width: 52ch; margin: 2.2rem auto 0; color: #5A5D66; font-size: .95rem; }
+
+/* ----------------------------------------------------------------- scale -- */
+
+.scale { position: relative; padding: 2.5rem .5rem 3rem; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); }
+.axis { position: relative; height: 2px; margin: 0 1.5rem; background: var(--line-2); }
+.tick { position: absolute; top: -.35rem; width: 1px; height: .7rem; background: var(--line-2); }
+.tick b { position: absolute; top: 1rem; left: 50%; transform: translateX(-50%); font: 500 .7rem/1 var(--mono); color: var(--dim); }
+
+.dot {
+  position: absolute; top: 50%;
+  width: .55rem; height: .55rem; margin-left: -.275rem;
+  border-radius: 50%; background: var(--ok);
+  transform: translateY(-50%) scale(0);
+  transition: transform .4s cubic-bezier(.34, 1.4, .64, 1);
+}
+.dot.is-on { transform: translateY(-50%) scale(1); }
+.dot.de { background: var(--warn); }
+
+.key { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 2.2rem; font-size: .8rem; color: var(--muted); }
+.key span { display: inline-flex; align-items: center; gap: .4rem; }
+.key i { width: .55rem; height: .55rem; border-radius: 50%; display: inline-block; }
+.key .k-en { background: var(--ok); }
+.key .k-de { background: var(--warn); }
+
+/* ---------------------------------------------------------------- header -- */
+
+.eyebrow {
+  margin: 0 0 .8rem;
+  font: 500 .68rem/1 var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h2 { margin: 0 0 .8rem; font: 600 clamp(1.7rem, 3.6vw, 2.5rem)/1.15 var(--sans); letter-spacing: -.025em; }
+.lede { max-width: 54ch; margin: 0 0 2.2rem; color: var(--muted); }
+
+/* ---------------------------------------------------------------- footer -- */
+
+.foot { border-top: 1px solid var(--line); padding: clamp(2.5rem, 6vw, 4rem) 0 2rem; }
+.foot-grid { display: grid; gap: 2rem; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 54rem) { .foot-grid { grid-template-columns: minmax(0, 1fr); } }
+.foot h4 { margin: 0 0 .8rem; font: 500 .68rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.foot a { display: block; padding: .2rem 0; color: var(--muted); text-decoration: none; font-size: .9rem; }
+.foot a:hover { color: var(--text); }
+.foot-bar { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; justify-content: space-between; margin-top: 2.5rem; padding-top: 1.2rem; border-top: 1px solid var(--line); font: 500 .72rem/1.6 var(--mono); color: var(--dim); }
+.foot-bar a { display: inline; color: var(--muted); }
+
+/* ---------------------------------------------------------------- reveal -- */
+
+.rise { opacity: 0; transform: translateY(14px); transition: opacity .5s cubic-bezier(.22,1,.36,1), transform .5s cubic-bezier(.22,1,.36,1); }
+.rise.is-in { opacity: 1; transform: none; }
+
+/* ------------------------------------------------------- reduced motion -- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .rise { opacity: 1; transform: none; transition: none; }
+  .dot { transform: translateY(-50%) scale(1); transition: none; }
+  .reveal-text .w { color: var(--paper-in); transition: none; }
+  .btn, .chip, .icon, .nav-links a { transition: none; }
+}
